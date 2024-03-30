@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 ipv4_api_a="ipv4.icanhazip.com"
 ipv6_api_a="api6.ipify.org"    
@@ -12,6 +12,16 @@ log() {
 		local timestamp=$(date +"%Y-%m-%d %H:%M:%S")
 		echo -e "[$timestamp] - $1"
         #echo -e "[$timestamp] - $1" >> $log_file
+    fi
+}
+
+sendmail(){	
+	if [ -f "email.txt" ] && [ -s "email.txt" ]; then
+		sed -i "s/oldip/${1}/g" email.txt
+		sed -i "s/newip/${2}/g" email.txt
+		ssmtp ${EMAIL} < email.txt
+	else 
+		log "未找到邮件通知配置，不通知！"
     fi
 }
 
@@ -87,14 +97,12 @@ else
     exit
 fi
 
-# 检查开始
-log "检查中!"
 #判断ip是否发生变化
 if [ -f $ip_file ]; then
     old_ip=$(cat $ip_file)
     if [ $ip == $old_ip ]; then
         log "IP没有更改!"
-        log "---------------------------------------------------"
+        log "----------------------------------------------------------------------"
         exit
     fi
 fi
@@ -102,9 +110,9 @@ fi
 update=$(curl -s -X PUT "https://api.cloudflare.com/client/v4/zones/$zone_identifier/dns_records/$record_identifier" -H "X-Auth-Email: $CF_EMAIL" -H "X-Auth-Key: $CF_KEY" -H "Content-Type: application/json" --data "{\"type\":\"$CF_RECORD_TYPE\",\"name\":\"$CF_RECORD_NAME\",\"content\":\"$ip\",\"ttl\":120,\"proxied\":false}")
 #反馈更新情况
 if [ "$update" != "${update%success*}" ] && [ "$(echo $update | grep "\"success\":true")" != "" ]; then
-  log "更新成功啦!"
-  log "上次IP:$(cat $ip_file)"
-  log "本次IP:$ip"
+  log "IP更新成功！"
+  log "上次IP:$(cat $ip_file),本次IP:$ip"
+  sendmail $(cat $ip_file) $ip
   log "----------------------------------------------------------------------"
   echo $ip > $ip_file
   exit
