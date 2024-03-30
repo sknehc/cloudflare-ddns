@@ -14,4 +14,4 @@ RUN chmod +x /app/*.sh
 WORKDIR /app
 
 # 启动 crond
-CMD ["/bin/sh","-c","/app/init.sh"]
+CMD ["/bin/sh","-c","/app/entrypoint.sh"]

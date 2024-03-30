@@ -37,8 +37,3 @@ Subject: IP变动通知
 
 上次IP：oldip，本次IP：newip.
 EOF
-while true
-do
-	./start.sh
-	sleep 600
-done
