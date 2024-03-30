@@ -19,7 +19,7 @@ sendmail(){
 	if [ -f "email.txt" ] && [ -s "email.txt" ]; then
 		rm -f email.tmp && cp email.txt email.tmp
 		sed -i "s/oldip/${1}/g" email.tmp
-		sed -i "s/newip/${2}/g" email.mp
+		sed -i "s/newip/${2}/g" email.tmp
 		ssmtp ${EMAIL} < email.tmp
 	else 
 		log "未找到邮件通知配置，不通知！"

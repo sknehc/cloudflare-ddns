@@ -10,11 +10,8 @@ COPY *.sh /app/
 # 设置脚本的执行权限
 RUN chmod +x /app/*.sh
 
-# 添加 cron 文件
-RUN echo "*/10 * * * * /bin/sh /app/start.sh" > /etc/crontabs/root
-
 # 定义工作目录
 WORKDIR /app
 
 # 启动 crond
-CMD ["/bin/sh","-c","/app/init.sh && crond -f"]
+CMD ["/bin/sh","-c","/app/init.sh"]
